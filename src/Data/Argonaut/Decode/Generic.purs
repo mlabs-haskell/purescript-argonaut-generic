@@ -27,6 +27,7 @@ import Foreign.Object as FO
 import Partial.Unsafe (unsafeCrashWith)
 import Prim.TypeError (class Fail, Text)
 import Type.Proxy (Proxy(..))
+foreign import eqquis :: String -> String -> Boolean
 
 class DecodeRep r where
   decodeRepWith :: Encoding -> Json -> Either JsonDecodeError r
@@ -53,7 +54,7 @@ withTag e j name = do
   jObj <- note (decodingErr $ TypeMismatch "Object") (toObject j)
   jTag <- note (decodingErr $ AtKey e.tagKey MissingValue) (FO.lookup e.tagKey jObj)
   tag <- note (decodingErr $ AtKey e.tagKey $ TypeMismatch "String") (toString jTag)
-  when (tag /= name) $
+  when (eqquis tag name) $
     Left $ decodingErr $ AtKey e.tagKey $ UnexpectedValue $ fromString tag
   pure {tag, decodingErr}
 
